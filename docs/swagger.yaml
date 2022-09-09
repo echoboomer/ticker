@@ -1,0 +1,112 @@
+basePath: /api/v1
+definitions:
+  api.JSONFailureResponse:
+    properties:
+      message:
+        example: api err
+        type: string
+      result:
+        example: failure
+        type: string
+    type: object
+  api.JSONHealthResponse:
+    properties:
+      status:
+        example: status
+        type: string
+    type: object
+  stocks.StockDataResponseItem:
+    properties:
+      1. open:
+        example: "279.0800"
+        type: string
+      2. high:
+        example: "280.3400"
+        type: string
+      3. low:
+        example: "267.9800"
+        type: string
+      4. close:
+        example: "268.0900"
+        type: string
+      5. volume:
+        example: "27549307"
+        type: string
+    type: object
+  stocks.StockDataResponseScoped:
+    properties:
+      average_close_price:
+        type: number
+      items:
+        additionalProperties:
+          $ref: '#/definitions/stocks.StockDataResponseItem'
+        type: object
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: scott@echoboomer.net
+    name: Scott Hawkins
+  description: An API that takes a stock SYMBOL and days as NDAYS and returns information
+    about the stock.
+  title: ticker API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      description: Return health status if the application is running.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.JSONHealthResponse'
+      summary: Return health status if the application is running.
+      tags:
+      - health
+  /stock:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve information about a given stock symbol parsed as env SYMBOL
+        with full response data.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/stocks.StockDataResponseItem'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.JSONFailureResponse'
+      summary: Retrieve information about a given stock symbol parsed as env SYMBOL
+        with full response data.
+      tags:
+      - getStock
+  /stock/avg:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve information about a given stock symbol parsed as env SYMBOL
+        over days NDAYS. Returns a list of matched items and average close price.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/stocks.StockDataResponseScoped'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.JSONFailureResponse'
+      summary: Retrieve information about a given stock symbol parsed as env SYMBOL
+        over days NDAYS.
+      tags:
+      - getStockAvg
+swagger: "2.0"
